@@ -7,11 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/morfien101/web_healthcheck/webserver"
+	"github.com/morfien101/web_responder/webserver"
 )
 
 var (
-	version = "0.0.1"
+	version = "development"
 
 	defaultResponse = `{"healthy":true}`
 	defaultPath     = "/_status"
