@@ -1,0 +1,1 @@
+docker build --platform=linux/x86_64 -t morfien101/web_responder:latest .
