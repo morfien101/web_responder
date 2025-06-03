@@ -1,17 +1,29 @@
-FROM ubuntu:latest as downloader
+FROM golang:1.23 AS builder
+ARG OS=linux
+ARG OUTPUT_DIR=/build
+ARG FILENAME=web_healthcheck
 
-RUN apt-get update && apt-get install -y curl \
-&& curl -SsL https://github.com/morfien101/web_responder/releases/download/v1.0.0/web_healthcheck_linux_amd64 -o /web_healthcheck \
-&& chmod +x /web_healthcheck
+COPY . .
 
-FROM ubuntu:latest as scratch-pad
+RUN <<EOF
+mkdir -p "$OUTPUT_DIR"
+go mod download
+CGO_ENABLED=0 GOOS="$OS" go build -a -installsuffix cgo -o "$OUTPUT_DIR/$FILENAME"
+chmod 775 "$OUTPUT_DIR/$FILENAME"
+EOF
+
+FROM ubuntu:24.04 AS scratch-pad
 RUN echo "nobody:x:65534:65534:Nobody:/:" > /tmp/scratch_passwd
 
 FROM scratch
+ARG OS=linux
+ARG OUTPUT_DIR=/build
+ARG FILENAME=web_healthcheck
+
 
 COPY --from=scratch-pad /tmp/scratch_passwd /etc/passwd
 USER nobody
 
-COPY --from=downloader /web_healthcheck /web_healthcheck
+COPY --from=builder "$OUTPUT_DIR/$FILENAME" "/$FILENAME"
 
 ENTRYPOINT [ "/web_healthcheck" ]

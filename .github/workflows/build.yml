@@ -5,10 +5,10 @@ jobs:
     if: startsWith(github.ref, 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
-          go-version: "^1.20"
+          go-version: "^1.24"
       - name: go test
         run: go test -v ./...
   test_build_release:
@@ -17,10 +17,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
-          go-version: "^1.19.1"
+          go-version: "^1.24"
       - name: Get the version
         id: get_tag
         run: echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}

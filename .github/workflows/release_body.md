@@ -1,4 +1,3 @@
-# Updating Go and adding in Mac support
+# Disable CORS checking by allowing everything
 
-Updating the version of go used to build the project.
-Adding in a build for Mac machines.
+Add allow all for CORS so we can test via browsers.

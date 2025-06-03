@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-//ServerConfig is used to hold the values about the HTTP server.
+// ServerConfig is used to hold the values about the HTTP server.
 type ServerConfig struct {
 	Cert          string
 	Key           string
@@ -44,11 +44,11 @@ func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 // If the configuration has TLS enabled it will be used.
 func (s *Server) Start() error {
 	if s.config.Cert != "" && s.config.Key != "" {
-		fmt.Println("Starting the HTTPS Server")
+		fmt.Println("Starting the HTTP Server on ")
 		return s.HTTP.ListenAndServeTLS(s.config.Cert, s.config.Key)
 	}
 
-	fmt.Println("Starting the HTTP Server")
+	fmt.Println("Starting the HTTP Server on:", s.config.ListenAddress)
 	return s.HTTP.ListenAndServe()
 }
 
@@ -60,6 +60,10 @@ func (s *Server) Stop(timeout int) error {
 	return s.HTTP.Shutdown(ctx)
 }
 
+func AddAnyCors(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func digestRoutes(routes map[string][]byte) *http.ServeMux {
 	r := http.NewServeMux()
 	for path, payload := range routes {
@@ -67,6 +71,7 @@ func digestRoutes(routes map[string][]byte) *http.ServeMux {
 		r.HandleFunc(
 			path,
 			func(w http.ResponseWriter, r *http.Request) {
+				AddAnyCors(w)
 				w.Header().Set("content-type", "application/json")
 				w.Write(payload)
 			},
